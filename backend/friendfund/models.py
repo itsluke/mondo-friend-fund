@@ -1,19 +1,49 @@
 from django.db import models
+from django.conf import settings
 from django.contrib.auth.models import User
-from .utils import MondoClientStaging
+from django.dispatch.dispatcher import receiver
+from mondo.exceptions import MondoApiException
+from .utils import MondoClientStaging, refresh_access_token
 
 
 class Profile(models.Model):
 
     mondo_user_id = models.CharField(max_length=255)
-    mondo_account_id = models.CharField(max_length=255)
-    user = models.OneToOneField(User)
+    mondo_account_id = models.CharField(null=True, max_length=255)
+    refresh_token = models.CharField(null=True, max_length=255)
+    user = models.OneToOneField(User, null=True)
 
-    def balance(self):
-        client = MondoClientStaging(
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjaSI6Im9hdXRoY2xpZW50XzAwMDA5NFB2SU5ER3pUM2s2dHo4'
-            'anAiLCJleHAiOjE0NjA5ODExOTksImlhdCI6MTQ2MDgwODM5OSwianRpIjoidG9rXzAwMDA5N0Z2dHBSRkN4Z3BXZ'
-            'GtocHgiLCJ1aSI6InVzZXJfMDAwMDk3RnUwcnFLU3lvMzJLZUxidCIsInYiOiI0In0.e1FFcZFZbGGLSMwTYSCxYX'
-            'B-EG4HSIlJbALCKdyUP9g')
+    def generate_access_token(self, request):
+        try:
+            access_token, refresh_token = refresh_access_token(settings.MONDO_CLIENT_ID,
+                                                               settings.MONDO_CLIENT_SECRET,
+                                                               self.refresh_token)
+            self.refresh_token = refresh_token
+            request.session['access_token'] = access_token
+            return True
+        except MondoApiException:
+            return None
+
+    def get_api_client(self, request):
+        if 'access_token' not in request.session:
+            self.generate_access_token(request)
+        return MondoClientStaging(request.session.get('access_token'))
+
+    def populate_account(self, request):
+        client = self.get_api_client(request)
+        accounts = client.list_accounts()
+        self.mondo_account_id = accounts[0].id
+        self.save()
+
+    def balance(self, request):
+        client = self.get_api_client(request)
         balance = client.get_balance(self.mondo_account_id)
         return str(balance.amount) if balance else None
+
+
+# Creating a profile create the associated user
+@receiver(models.signals.pre_save, sender=Profile)
+def _profile_create_user(sender, instance, **kwargs):  # pylint: disable=unused-argument
+    if instance.user is None:
+        user = User.objects.create(username=instance.mondo_user_id)
+        instance.user = user

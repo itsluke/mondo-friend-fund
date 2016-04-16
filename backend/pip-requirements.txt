@@ -5,3 +5,4 @@ ipython==4.1.1
 Werkzeug==0.11.3
 django-debug-toolbar==1.4
 django-extensions==1.6.1
+djangorestframework-jsonapi==2.0.0-beta.2

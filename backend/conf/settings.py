@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'rest_framework',
+    # 'rest_framework_json_api',
     'friendfund',
 ]
 
@@ -40,6 +41,10 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+AUTHENTICATION_BACKENDS = (
+    'friendfund.auth_backend.PasswordlessAuthBackend',
+)
 
 ROOT_URLCONF = 'conf.urls'
 
@@ -73,9 +78,6 @@ DATABASES = {
 }
 
 
-# Password validation
-# https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     # {
     #     'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -92,17 +94,30 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/1.9/topics/i18n/
-
 LANGUAGE_CODE = 'en-gr'
 TIME_ZONE = 'Europe/London'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
+# REST_FRAMEWORK = {
+#     'PAGE_SIZE': 10,
+#     'EXCEPTION_HANDLER': 'rest_framework_json_api.exceptions.exception_handler',
+#     'DEFAULT_PAGINATION_CLASS':
+#         'rest_framework_json_api.pagination.PageNumberPagination',
+#     'DEFAULT_PARSER_CLASSES': (
+#         'rest_framework_json_api.parsers.JSONParser',
+#         'rest_framework.parsers.FormParser',
+#         'rest_framework.parsers.MultiPartParser'
+#     ),
+#     'DEFAULT_RENDERER_CLASSES': (
+#         'rest_framework_json_api.renderers.JSONRenderer',
+#         'rest_framework.renderers.BrowsableAPIRenderer',
+#     ),
+#     # 'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
+# }
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_URL = '/static/'
+MONDO_CLIENT_ID = 'oauthclient_000097G3gdufXybTp1lWEb'
+MONDO_CLIENT_SECRET = 'NA2XHuTtIZzmDUM4SkXnjHoQbV6Gyhblxee1rMzKRcIdxZhXyTlzQ1OKppGjNCFyV1rjD77PNVrgri2Gg+9z'
