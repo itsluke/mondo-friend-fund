@@ -1,0 +1,10 @@
+data/
+venv/
+/static/
+media/
+conf/local.py
+*.pyc
+*.sublime*
+.Apple*
+.DS_Store
+pylintrc
