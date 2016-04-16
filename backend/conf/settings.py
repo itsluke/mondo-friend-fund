@@ -100,6 +100,8 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
+RUNSERVERPLUS_SERVER_ADDRESS_PORT = '0.0.0.0:8080'
+
 # REST_FRAMEWORK = {
 #     'PAGE_SIZE': 10,
 #     'EXCEPTION_HANDLER': 'rest_framework_json_api.exceptions.exception_handler',

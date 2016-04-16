@@ -2,7 +2,8 @@ from collections import OrderedDict
 from django.http import HttpResponseRedirect
 from django.conf import settings
 from django.contrib.auth import login, logout, authenticate
-from rest_framework.generics import RetrieveAPIView
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.reverse import reverse
 from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
@@ -27,12 +28,18 @@ class ApiRootView(views.APIView):
         return Response(ret)
 
 
-class UserAccountView(views.APIView):
+class UserAccountViewSet(RetrieveUpdateAPIView):
 
-    def get(self, request, *_args, **_kwargs):
-        data = Profile.objects.get(pk=1)
-        serializer = UserAccountSerializer(data, context={'request': request})
-        return Response(serializer.data)
+    permission_classes = (IsAuthenticated,)
+    serializer_class = UserAccountSerializer
+
+    def get_object(self):
+        return self.request.user.profile
+
+    # def get(self, request, *_args, **_kwargs):
+    #     profile = request.user.profile
+    #     serializer = UserAccountSerializer(data, context={'request': request})
+    #     return Response(serializer.data)
 
 
 class AuthenticationViewSet(views.APIView):
@@ -49,14 +56,20 @@ class AuthenticationViewSet(views.APIView):
                 access_token, refresh_token, user_id = exchange_authorization_code_for_access_token(
                     settings.MONDO_CLIENT_ID, settings.MONDO_CLIENT_SECRET, code, callback)
 
-                profile, _ = Profile.objects.get_or_create(mondo_user_id=user_id)
+                # Getting or creating the new user
+                profile, created = Profile.objects.get_or_create(mondo_user_id=user_id)
                 profile.refresh_token = refresh_token
                 profile.save()
 
+                # Authenticating
                 user = authenticate(username=profile.user.username)
                 login(request, user)
                 request.session['access_token'] = access_token
-                profile.populate_account(request)
+
+                # Populate the info
+                if created:
+                    profile.populate_account(request)
+
                 return Response({'status': 'ok'})
 
             except MondoApiException:
