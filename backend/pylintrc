@@ -1,0 +1,56 @@
+[MASTER]
+profile=no
+persistent=yes
+ignore=CVS,.coverage,.git,.idea,migrations
+cache-size=500
+init-hook='sys.path.append("/Users/antwan/Projects/mondo-hack/venv/lib/python3.5/site-packages")'
+
+[MESSAGES CONTROL]
+# missing-docstring      No docstring
+# old-style-class        Old-style class defined
+# star-args              Used * or * magic* Used when a function or method is called using *args or **kwargs to dispatch arguments.
+# no-init                Class has no __init__ method Used when a class has no __init__ method, neither its parent classes.
+# line-too-long          Long lines are covered in pep8
+# no-value-for-parameter Used when a function call passes too few arguments - but doesn't play well with django's metaclass blackmagic
+# no-self-use            Method could be a function
+# locally-disabled       Removes warning when doing local disable
+# protected-access       Removes warning when accessing protected member
+# redefined-builtin      Allow using "id" parameters
+disable=missing-docstring, old-style-class, star-args, no-init, line-too-long, no-value-for-parameter, no-self-use, locally-disabled, protected-access, redefined-builtin
+
+[REPORTS]
+# UserWarning: parseable output format is deprecated in pylint
+output-format=parseable
+
+[BASIC]
+no-docstring-rgx=__.*__|_.*
+class-rgx=[A-Z_][a-zA-Z0-9_]+$
+function-rgx=[a-z_][a-zA-Z0-9_]{2,70}$
+method-rgx=[a-z_][a-zA-Z0-9_]{2,70}$
+attr-rgx=[a-z_][a-zA-Z0-9_]{2,70}$
+const-rgx=(([A-Z_][A-Z0-9_]*)|(__.*__)|logger)$
+good-names=_,f,i,j,k,v,x,y,z,e,qs,id,pk,ok,r,g,b,a,n
+
+[TYPECHECK]
+# List of classes names for which member attributes should not be checked
+# (useful for classes with attributes dynamically set).
+ignored-classes=ForeignKey,ManyToManyField,OneToOneField
+
+# List of members which are set dynamically and missed by pylint inference
+# system, and so shouldn't trigger E0201 when accessed.
+generated-members=objects, DoesNotExist, id, pk, _meta, base_fields, get
+
+[VARIABLES]
+dummy-variables-rgx=_|args|kwargs|dummy
+
+[SIMILARITIES]
+min-similarity-lines=6
+
+[DESIGN]
+max-args=10
+max-attributes=10
+min-public-methods=0
+max-public-methods=100
+max-parents=15
+max-locals=25
+max-branches=20
